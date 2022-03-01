@@ -46,6 +46,51 @@
                 </div>
             {% endfor %}
         </p>
+        <p>
+            {{ form.name.label }}<br>
+            {{ form.name }}<br>
+            {% for error in form.name.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.age.label }}<br>
+            {{ form.age }}<br>
+            {% for error in form.age.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.position.label }}<br>
+            {{ form.position }}<br>
+            {% for error in form.position.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.speciality.label }}<br>
+            {{ form.speciality }}<br>
+            {% for error in form.speciality.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.address.label }}<br>
+            {{ form.address }}<br>
+            {% for error in form.address.errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </p>
 
 
         <p>{{ form.submit() }}</p>
