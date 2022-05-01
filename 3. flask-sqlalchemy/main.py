@@ -62,8 +62,7 @@ def reqister():
                                    message="Такой пользователь уже есть")
         user = User(
             name=form.name.data,
-            email=form.login.data,
-            hashed_password=form.password.data
+            email=form.login.data
         )
         user.set_password(form.password.data)
         db_sess.add(user)
