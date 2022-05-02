@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1> Add work form </h1>
+    <h1> Redact work form </h1>
+    <figcaption class="blockquote-footer">
+        *you mustn't fill full blank
+    </figcaption>
 
     {% if message %}
         <div class="alert alert-warning" role="alert">
@@ -9,7 +12,7 @@
         </div>
     {% endif %}
 
-    <form action="" method="post" novalidate>
+    <br><form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
             {{ form.team_leader.label }}<br>
