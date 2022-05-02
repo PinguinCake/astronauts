@@ -2,7 +2,8 @@ from flask import Flask, render_template, redirect
 from data import db_session, jobs_api
 from data.users import User
 from data.jobs import Jobs
-from data.forms import RegisterForm, LoginForm, WorksForm, WorksRedactionForm
+from data.departments import Department
+from data.forms import RegisterForm, LoginForm, WorksForm, WorksRedactionForm, DepartmentsForm, DepartmentsRedactionForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 app = Flask(__name__)
@@ -19,10 +20,17 @@ def load_user(id):
 
 
 @app.route("/")
-def index():
+def journal_works():
     session = db_session.create_session()
     jobs = session.query(Jobs).all()
-    return render_template("journal_works.html", jobs=jobs)
+    return render_template("journal_works.html", title='List of Jobs', jobs=jobs)
+
+
+@app.route("/departments")
+def journal_departments():
+    session = db_session.create_session()
+    departments = session.query(Department).all()
+    return render_template("journal_departments.html", title='List of Departments', departments=departments)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -35,9 +43,9 @@ def login():
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
         return render_template('login.html',
-                               message="Неправильный логин или пароль",
+                               message="Wrong email or password",
                                form=form)
-    return render_template('login.html', title='Авторизация', form=form)
+    return render_template('login.html', title='Authorisation', form=form)
 
 
 @app.route('/logout')
@@ -52,14 +60,14 @@ def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.confirm.data:
-            return render_template('register.html', title='Регистрация',
+            return render_template('register.html', title='Registration',
                                    form=form,
-                                   message="Пароли не совпадают")
+                                   message="Passwords don't match")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.login.data).first():
-            return render_template('register.html', title='Регистрация',
+            return render_template('register.html', title='Registration',
                                    form=form,
-                                   message="Такой пользователь уже есть")
+                                   message="This user already exists")
         user = User(
             name=form.name.data,
             email=form.login.data
@@ -68,7 +76,7 @@ def reqister():
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('register.html', title='Registration', form=form)
 
 
 @app.route('/add_work', methods=['GET', 'POST'])
@@ -87,7 +95,7 @@ def add_work():
         db_sess.add(job)
         db_sess.commit()
         return redirect('/')
-    return render_template('add_work.html', title='Добавление работ', form=form)
+    return render_template('add_work.html', title='Adding Job', form=form)
 
 
 @app.route('/redact_work/<int:work_id>', methods=['GET', 'POST'])
@@ -109,7 +117,7 @@ def redact_work(work_id):
             return redirect('/')
         else:
             return 'Что-то пошло не так...'
-    return render_template('redact_work.html', title=f'Изменение работы: {work_id}', form=form)
+    return render_template('redact_work.html', title=f'Redacting Job: {work_id}', form=form)
 
 
 @app.route('/delete_work/<int:work_id>', methods=['GET', 'POST'])
@@ -125,6 +133,61 @@ def delete_work(work_id):
     else:
         return 'Что-то пошло не так...'
     return redirect('/')
+
+
+@app.route('/add_department', methods=['GET', 'POST'])
+def add_department():
+    form = DepartmentsForm()
+    if form.submit.data:
+        db_sess = db_session.create_session()
+        department = Department(
+            title=form.title.data,
+            chief=current_user.id,
+            members=form.members.data,
+            email=form.email.data
+        )
+        db_sess.add(department)
+        db_sess.commit()
+        return redirect('/departments')
+    return render_template('add_department.html', title='Adding Department', form=form)
+
+
+@app.route('/redact_department/<int:department_id>', methods=['GET', 'POST'])
+def redact_department(department_id):
+    form = DepartmentsRedactionForm()
+    if form.submit.data:
+        db_sess = db_session.create_session()
+        if current_user.id != 1:
+            department = db_sess.query(Department).filter(Department.id == department_id,
+                                                          Department.chief == current_user.id).first()
+        else:
+            department = db_sess.query(Department).filter(Department.id == department_id).first()
+        if department:
+            department.title = form.title.data if form.title.data else department.title
+            department.chief = form.chief.data if form.chief.data else department.chief
+            department.members = form.members.data if form.members.data else department.members
+            department.email = form.email.data if form.email.data else department.email
+            db_sess.commit()
+            return redirect('/departments')
+        else:
+            return 'Что-то пошло не так...'
+    return render_template('redact_department.html', title=f'Redacting Department: {department_id}', form=form)
+
+
+@app.route('/delete_department/<int:department_id>', methods=['GET', 'POST'])
+def delete_department(department_id):
+    db_sess = db_session.create_session()
+    if current_user.id != 1:
+        department = db_sess.query(Department).filter(Department.id == department_id,
+                                                      Department.chief == current_user.id).first()
+    else:
+        department = db_sess.query(Department).filter(Department.id == department_id).first()
+    if department:
+        db_sess.delete(department)
+        db_sess.commit()
+    else:
+        return 'Что-то пошло не так...'
+    return redirect('/departments')
 
 
 def main():

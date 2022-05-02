@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1> Redact Job form </h1>
+    <h1> Redact Department form </h1>
     <figcaption class="blockquote-footer">
         *you mustn't fill full blank
     </figcaption>
@@ -15,43 +15,40 @@
     <br><form action="" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
-            {{ form.team_leader.label }}<br>
-            {{ form.team_leader }}<br>
-            {% for error in form.team_leader.errors %}
+            {{ form.title.label }}<br>
+            {{ form.title }}<br>
+            {% for error in form.title.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </p>
         <p>
-            {{ form.job.label }}<br>
-            {{ form.job }}<br>
-            {% for error in form.job.errors %}
+            {{ form.chief.label }}<br>
+            {{ form.chief }}<br>
+            {% for error in form.chief.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </p>
         <p>
-            {{ form.work_size.label }}<br>
-            {{ form.work_size }}<br>
-            {% for error in form.work_size.errors %}
+            {{ form.members.label }}<br>
+            {{ form.members }}<br>
+            {% for error in form.members.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </p>
         <p>
-            {{ form.collaborators.label }}<br>
-            {{ form.collaborators }}<br>
-            {% for error in form.collaborators.errors %}
+            {{ form.email.label }}<br>
+            {{ form.email }}<br>
+            {% for error in form.email.errors %}
                 <div class="alert alert-danger" role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
-        </p>
-        <p> {{ form.is_finished }}
-            {{ form.is_finished.label }}
         </p>
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
     </form>
